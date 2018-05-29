@@ -44,4 +44,5 @@ jobs:
 
       - store_artifacts:
           path: bootstrap/target/BungeeCord.jar
+          destination: BungeeCord.jar
 

@@ -43,5 +43,5 @@ jobs:
       - run: mvn package -DskipTests=true
 
       - store_artifacts:
-          path: bootstrap/target/BungeCord.jar
+          path: ~/repo/bootstrap/target/BungeCord.jar
 

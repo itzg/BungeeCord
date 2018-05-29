@@ -59,6 +59,7 @@ public class Configuration implements ProxyConfig
     private int compressionThreshold = 256;
     private boolean preventProxyConnections;
     private boolean forgeSupport;
+    private boolean useKubernetesDiscovery;
 
     public void load()
     {
@@ -88,6 +89,7 @@ public class Configuration implements ProxyConfig
         compressionThreshold = adapter.getInt( "network_compression_threshold", compressionThreshold );
         preventProxyConnections = adapter.getBoolean( "prevent_proxy_connections", preventProxyConnections );
         forgeSupport = adapter.getBoolean( "forge_support", forgeSupport );
+        useKubernetesDiscovery = adapter.getBoolean( "use_kubernetes_discovery", useKubernetesDiscovery );
 
         disabledCommands = new CaseInsensitiveSet( (Collection<String>) adapter.getList( "disabled_commands", Arrays.asList( "disabledcommandhere" ) ) );
 
@@ -145,5 +147,34 @@ public class Configuration implements ProxyConfig
     public Favicon getFaviconObject()
     {
         return favicon;
+    }
+
+    public synchronized void addServer(String name, ServerInfo serverInfo) {
+        CaseInsensitiveMap<ServerInfo> newServers = new CaseInsensitiveMap<>(servers);
+        newServers.put(name, serverInfo);
+        servers = newServers;
+    }
+
+    public void addForcedHost(String forcedHost, String key) {
+        ListenerInfo listenerInfo = listeners.iterator().next();
+        Map<String, String> forcedHosts = listenerInfo.getForcedHosts();
+        synchronized (forcedHosts) {
+            forcedHosts.put(forcedHost, key);
+        }
+    }
+
+    public synchronized void removeServer(String name, ServerInfo serverInfo) {
+        CaseInsensitiveMap<ServerInfo> newServers = new CaseInsensitiveMap<>(servers);
+        newServers.remove(name);
+        servers = newServers;
+    }
+
+    public void removeForcedHost(String forcedHost, String key) {
+        ListenerInfo listenerInfo = listeners.iterator().next();
+        Map<String, String> forcedHosts = listenerInfo.getForcedHosts();
+        synchronized (forcedHosts) {
+            forcedHosts.remove(forcedHost);
+        }
+
     }
 }
